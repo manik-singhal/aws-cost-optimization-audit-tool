@@ -1,0 +1,9 @@
+resource_type,resource_id,name,age_days,size_gb,size_mb,issue,recommendation,estimated_monthly_cost
+EC2,i-0a1b2c3d4e5f6g7h8,web-server-prod,45,,,,Stopped for 45 days,0.50
+EC2,i-9h8g7f6e5d4c3b2a1,db-server-staging,120,,,,Stopped for 120 days,0.50
+EBS,vol-0123456789abcdef0,,93,50,,,Volume is unattached; created 93 days ago,5.00
+EBS,vol-fedcba9876543210,,182,100,,,Volume is unattached; created 182 days ago,10.00
+S3,my-bucket/old-logs/2023-01-01.log,,367,,152,,Object is 367 days old,0.00341
+S3,my-bucket/archive/data.zip,,274,,1024,,Object is 274 days old,0.02355
+IAM User,john.doe,,,,,MFA not configured,Please configure MFA,0
+IAM User,jane.smith,,,,,MFA not configured,Please configure MFA,0
