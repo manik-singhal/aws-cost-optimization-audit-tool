@@ -21,7 +21,7 @@ def get_all_regions(ec2_client):
 
 
 # ---------------- EC2 ----------------
-def find_stopped_instances(ec2_client, days=7):
+def find_stopped_instances(ec2_client):
 
     logger.info("Checking for stopped EC2 instances...")
 
@@ -41,31 +41,12 @@ def find_stopped_instances(ec2_client, days=7):
                 if tag["Key"] == "Name":
                     name = tag["Value"]
 
-            state_reason = instance.get("StateTransitionReason", "")
-            stop_time = None
-
-            if "(" in state_reason and ")" in state_reason:
-                timestamp_str = state_reason.split("(")[1].split(")")[0]
-
-                try:
-                    stop_time = datetime.strptime(
-                        timestamp_str,
-                        "%Y-%m-%d %H:%M:%S GMT"
-                    ).replace(tzinfo=timezone.utc)
-                except Exception:
-                    stop_time = None
-
-            if stop_time:
-                age_days = (datetime.now(timezone.utc) - stop_time).days
-
-                if age_days > days:
-                    stopped_instances.append({
-                        "resource_type": "EC2",
-                        "resource_id": instance_id,
-                        "name": name,
-                        "age_days": age_days,
-                        "recommendation": f"Stopped for {age_days} days"
-                    })
+            stopped_instances.append({
+                "resource_type": "EC2",
+                "resource_id": instance_id,
+                "name": name,
+                "recommendation": "Instance is stopped"
+            })
 
     return stopped_instances
 
