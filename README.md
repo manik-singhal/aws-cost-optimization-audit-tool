@@ -9,7 +9,7 @@ Provides a lightweight governance utility to identify cost leakage and basic sec
 ## What It Does
 
 Scans AWS accounts across EC2, EBS, S3, and IAM to identify:
-- EC2 instances stopped beyond configurable threshold (default: 7 days)
+- EC2 instances that are in stopped state
 - Unattached EBS volumes
 - S3 objects older than configurable threshold (default: 90 days)
 - IAM users without MFA
@@ -39,7 +39,7 @@ Requires AWS credentials via `aws configure` or environment variables.
 CSV with dynamic schema (columns depend on resource type):
 ```
 resource_type,resource_id,age_days,size_gb,estimated_monthly_cost,recommendation
-EC2,i-abc123,45,,,0.50,"Stopped for 45 days"
+EC2,i-abc123,45,,,0.50,"Instance is stopped"
 EBS,vol-xyz789,120,100,10.00,"Delete - 120 days old"
 S3,bucket/file.txt,180,,0.0056,"Object is 180 days old"
 IAM User,john.doe,,,,0,"MFA not configured"
@@ -49,7 +49,7 @@ IAM User,john.doe,,,,0,"MFA not configured"
 
 ## Technical Implementation
 
-**EC2:** Parses `StateTransitionReason` to extract stop time and calculate days stopped
+**EC2:** Uses describe_instances with state filter to identify stopped instances
 
 **EBS:** Queries volumes with status "available" and calculates age from `CreateTime`
 
@@ -73,9 +73,9 @@ IAM User,john.doe,,,,0,"MFA not configured"
 - S3 bucket name hardcoded (line 208) - can be converted to CLI flag
 - Cost rates are approximations, not real-time AWS Pricing API
 - No pagination for EC2/EBS (assumes <1000 resources per region)
-- EC2 stop time parsing depends on AWS StateTransitionReason format
+- EC2 age-based filtering is not implemented (only detects stopped instances)
 - No retry/backoff for API throttling
-- Age thresholds parameterized within functions (default: EC2 7 days, S3 90 days)
+- Age thresholds parameterized within functions (default: S3 90 days)
 
 **Not included:**
 - RDS, Lambda, or other services
